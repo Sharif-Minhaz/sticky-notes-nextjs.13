@@ -10,7 +10,15 @@ export default function Navbar() {
 	return (
 		<nav className="flex justify-between items-center gap-2 bg-blue-500 px-5 py-4">
 			<Link href="/">
-				<Image priority src="/logo.png" width={130} height={65} alt="My Notes" />
+				<Image
+					priority
+					src="/logo.png"
+					alt="My Notes"
+					width={0}
+					height={0}
+					sizes="100vw"
+					className="w-[130px] h-auto"
+				/>
 			</Link>
 			<div className="flex">
 				<Link href="/" className={pathname === "/" ? "text-white" : "text-black"}>

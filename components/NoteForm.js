@@ -3,9 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function CreateNote() {
+export default function NoteForm({ note, update = false }) {
 	const router = useRouter();
-	const [formData, setFormData] = useState({ title: "", content: "" });
+	const [formData, setFormData] = useState({
+		title: note?.title || "",
+		content: note?.content || "",
+	});
 
 	const handleOnChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,13 +17,24 @@ export default function CreateNote() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			await fetch("http://127.0.0.1:8090/api/collections/notes/records", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
+			if (update) {
+				await fetch(`http://127.0.0.1:8090/api/collections/notes/records/${note.id}`, {
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+					cache: "reload",
+				});
+			} else {
+				await fetch("http://127.0.0.1:8090/api/collections/notes/records", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(formData),
+				});
+			}
 		} catch (error) {
 			console.error(error.message);
 		}
@@ -28,6 +42,7 @@ export default function CreateNote() {
 		setFormData({ title: "", content: "" });
 		e.target.reset();
 		router.refresh();
+		if (update) router.push(`/notes/${note.id}`);
 	};
 
 	return (
@@ -55,7 +70,7 @@ export default function CreateNote() {
 
 			<div>
 				<button className="bg-black text-white px-5 py-1.5" type="submit">
-					Create
+					{update ? "Update" : "Create"}
 				</button>
 			</div>
 		</form>

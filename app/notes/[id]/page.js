@@ -1,4 +1,6 @@
 // import PocketBase from "pocketbase";
+import { getNote } from "@/lib/getNote";
+import { format, parseISO } from "date-fns";
 
 export async function generateStaticParams() {
 	const notes = await fetch("http://127.0.0.1:8090/api/collections/notes/records").then((res) =>
@@ -8,18 +10,6 @@ export async function generateStaticParams() {
 	return notes.map((note) => ({
 		id: note.id,
 	}));
-}
-
-async function getNote(noteId) {
-	// const pb = new PocketBase("http://127.0.0.1:8090");
-	// const record = await pb.collection("notes").getOne(noteId);
-
-	const res = await fetch(`http://127.0.0.1:8090/api/collections/notes/records/${noteId}`, {
-		next: { revalidate: 10 },
-	});
-	const data = await res.json();
-
-	return data;
 }
 
 export default async function NotePage({ params }) {
@@ -34,7 +24,7 @@ export default async function NotePage({ params }) {
 				<h5 className="my-2">{note.content}</h5>
 				<p className="text-sm">
 					Created on:{" "}
-					<time dateTime={note.created}>{new Date(note.created).toUTCString()}</time>
+					<time dateTime={note.created}>{format(parseISO(note.created), "LLLL d, yyyy, hh:mm:ss aa")}</time>
 				</p>
 			</div>
 		</div>
